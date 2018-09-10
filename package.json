@@ -86,6 +86,7 @@
     "lint-staged": "^7.0.0",
     "mock-socket": "^7.1.0",
     "node-sass": "^4.9.3",
+    "prerender-spa-plugin": "^3.4.0",
     "prettier": "^1.10.2",
     "prop-types": "^15.6.0",
     "raf": "^3.4.0",

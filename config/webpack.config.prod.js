@@ -9,6 +9,8 @@ const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 const paths = require('./paths')
 const getClientEnvironment = require('./env')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const PrerenderSPAPlugin = require('prerender-spa-plugin')
+const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -153,19 +155,19 @@ module.exports = {
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       template: paths.appHtml,
-      filename: 'index.html'
-      // minify: {
-      //   removeComments: true,
-      //   collapseWhitespace: true,
-      //   removeRedundantAttributes: true,
-      //   useShortDoctype: true,
-      //   removeEmptyAttributes: true,
-      //   removeStyleLinkTypeAttributes: true,
-      //   keepClosingSlash: true,
-      //   minifyJS: true,
-      //   minifyCSS: true,
-      //   minifyURLs: true,
-      // },
+      filename: 'index.html',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true
+      }
     }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
@@ -215,6 +217,23 @@ module.exports = {
       navigateFallbackWhitelist: [/^(?!\/__).*/],
       // Don't precache sourcemaps (they're large) and build asset manifest:
       staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/]
+    }),
+    new PrerenderSPAPlugin({
+      // Index.html is in the root directory.
+      staticDir: path.join(__dirname, '..', 'build'),
+      routes: ['/', '/profile'],
+      // Optional minification.
+      minify: {
+        collapseBooleanAttributes: true,
+        collapseWhitespace: true,
+        decodeEntities: true,
+        keepClosingSlash: true,
+        sortAttributes: true
+      },
+
+      renderer: new Renderer({
+        renderAfterTime: 500
+      })
     }),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical
